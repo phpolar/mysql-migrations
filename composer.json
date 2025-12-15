@@ -60,7 +60,16 @@
             "@putenv XDEBUG_MODE=coverage",
             "@test --configuration=phpunit.ci.xml --coverage-clover=build/logs/clover.xml"
         ],
-        "ci:test-integration": "@test --configuration=phpunit.ci.xml --testsuite integration",
+        "ci:test-integration": [
+            "@start:testdb",
+            "@putenv MYSQL_DATABASE=testdb",
+            "@putenv MYSQL_HOST=127.0.0.1",
+            "@putenv MYSQL_PORT=3306",
+            "@putenv MYSQL_USER=migrator",
+            "@putenv MYSQL_PASSWORD=migrator_pass",
+            "@test --configuration=phpunit.ci.xml --testsuite integration",
+            "@stop:testdb"
+        ],
         "ci:test-build": "@ci:test-integration",
         "ci:generate-coverage-badge": [
             "@test --configuration=phpunit.coverage.xml",
