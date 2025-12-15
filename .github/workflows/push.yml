@@ -2,12 +2,13 @@ name: Build Check
 on:
   push:
     branches:
-      - 'main'
+      - "main"
     paths:
-      - '**.php'
-      - '.github/workflows/push.yml'
-      - 'composer.lock'
-      - 'phpunit*.xml'
+      - "**/src/bin/*"
+      - "**.php"
+      - ".github/workflows/push.yml"
+      - "composer.lock"
+      - "phpunit*.xml"
 jobs:
   coverage:
     uses: phpolar/github-workflows/.github/workflows/coverage.yml@v1
