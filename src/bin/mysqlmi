@@ -1,0 +1,130 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Phpolar\Migrations\CreateCommand;
+use Phpolar\Migrations\CreateCommandHandler;
+use Phpolar\Migrations\SimpleFileWriter;
+use Phpolar\Migrations\StreamLogger;
+
+use const Phpolar\MysqlMigrations\AVAILABLE_COMMANDS;
+use const Phpolar\MysqlMigrations\DB_CONNECTION_FILE;
+use const Phpolar\MysqlMigrations\DEFAULT_MIGRATIONS_FOLDER;
+
+use function Phpolar\MysqlMigrations\createMigration;
+use function Phpolar\MysqlMigrations\printHelp;
+use function Phpolar\MysqlMigrations\revertMigration;
+use function Phpolar\MysqlMigrations\runMigrations;
+
+require __DIR__ . "/../../vendor/autoload.php";
+
+$fileWriter = new SimpleFileWriter();
+$logger = new StreamLogger(STDOUT);
+
+$options = getopt("h", ["help"]);
+
+if (
+    is_array($options)
+    && count(array_intersect(["h", "help"], array_keys($options))) > 0
+    || $argc === 1
+) {
+    printHelp();
+    exit();
+}
+
+$lastArg = $argv[\array_key_last($argv)];
+$penultimateArg = $argv[\array_key_last($argv) - 1];
+
+$invalidArgs = in_array($lastArg, AVAILABLE_COMMANDS) === false
+    && in_array($penultimateArg, AVAILABLE_COMMANDS) === false
+    || (in_array($lastArg, AVAILABLE_COMMANDS) && in_array($penultimateArg, AVAILABLE_COMMANDS));
+$connectionFileNotExists = file_exists(DB_CONNECTION_FILE) === false;
+$migrationDirNotExists =
+    in_array($penultimateArg, AVAILABLE_COMMANDS) === true
+    && file_exists($lastArg) === false;
+$migrationDirWrongLocation = str_starts_with($lastArg, DIRECTORY_SEPARATOR) === true
+    || str_starts_with($lastArg, "..");
+$hasCommandAndDir =
+    file_exists($lastArg) === true
+    && in_array($penultimateArg, AVAILABLE_COMMANDS) === true;
+$commandIsLastArg = in_array($lastArg, AVAILABLE_COMMANDS);
+
+if ($invalidArgs === true) {
+    printHelp();
+    exit(127);
+}
+
+if ($connectionFileNotExists === true) {
+    $logger->error(
+        sprintf(
+            <<<FMT
+            A file named %s should exist in the working directory
+            that provides the PDO database connection.
+            FMT,
+            DB_CONNECTION_FILE,
+        ),
+    );
+    exit(127);
+}
+
+// @phan-suppress-next-line PhanMissingRequireFile
+$connection = include_once DB_CONNECTION_FILE;
+
+if ($connection instanceof PDO === false) {
+    $logger->error(
+        sprintf(
+            "MigrationError: The %s file should return an instance of %s",
+            DB_CONNECTION_FILE,
+            PDO::class,
+        ),
+    );
+    exit(127);
+}
+
+if (
+    $migrationDirNotExists === true
+    && $migrationDirWrongLocation === true
+) {
+    $logger->error("The migration directory should be within the current working directory.");
+    exit(127);
+}
+
+$migrationDirNotExists && mkdir(directory: $lastArg, recursive: true);
+
+$command = $hasCommandAndDir === true
+    ? $penultimateArg
+    : ($commandIsLastArg
+        ? $lastArg : "");
+
+$migrationsDir = $hasCommandAndDir === true
+    ? $lastArg
+    : getcwd() . DIRECTORY_SEPARATOR .  DEFAULT_MIGRATIONS_FOLDER;
+
+
+
+match ($command) {
+    "create" => createMigration(
+        options: getopt("n:", ["name:"]),
+        migrationsDir: $migrationsDir,
+        createCommandHandler: new CreateCommandHandler(
+            logger: $logger,
+            createCommand: new CreateCommand(
+                fileWriter: new SimpleFileWriter(),
+                dateTime: new DateTimeImmutable("now"),
+            ),
+        ),
+        logger: $logger,
+    ),
+    "revert" => revertMigration(
+        migrationsDir: $migrationsDir,
+        connection: $connection,
+        logger: $logger,
+    ),
+    "run" => runMigrations(
+        migrationsDir: $migrationsDir,
+        connection: $connection,
+        logger: $logger,
+    ),
+    "" => printHelp(),
+};

@@ -1,0 +1,109 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "phpolar/mysql-migrations",
+    "description": "Adds support for running migrations against a MySql database.",
+    "type": "library",
+    "require-dev": {
+        "ext-ast": "*",
+        "ext-openssl": "*",
+        "phan/phan": "^5.4",
+        "php-coveralls/php-coveralls": "^2.5",
+        "phpmd/phpmd": "^2.13",
+        "phpstan/phpstan": "^2.0.3",
+        "phpunit/phpunit": "^12",
+        "squizlabs/php_codesniffer": "^4"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "require": {
+        "php": ">=8.4",
+        "ext-pdo_mysql": "*",
+        "phpolar/migrations": "^1.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Phpolar\\MysqlMigrations\\": "src/"
+        },
+        "files": [
+            "src/constants.php",
+            "src/createMigration.php",
+            "src/error-messages.php",
+            "src/printHelp.php",
+            "src/revertMigration.php",
+            "src/runMigrations.php",
+            "src/sql-statements.php"
+        ]
+    },
+    "bin": [
+        "src/bin/mysqlmi"
+    ],
+    "license": "MIT",
+    "scripts": {
+        "analyze": [
+            "@putenv XDEBUG_MODE=off",
+            "phpstan analyze src --level 9"
+        ],
+        "analyze:strict": "phan --no-progress-bar --strict-type-checking --analyze-twice --color --output-mode=text --color-scheme=light",
+        "analyze:dead-code": "@analyze:strict --color-scheme=light --config-file=.phan/config_deadcode.php",
+        "check": [
+            "@lint -q",
+            "@analyze -q",
+            "@test:unit",
+            "@semgrep",
+            "@smell"
+        ],
+        "ci:analyze": "@analyze",
+        "ci:lint": "@lint",
+        "ci:lint-fix": "@lint-fix",
+        "ci:test": [
+            "@putenv XDEBUG_MODE=coverage",
+            "@test --configuration=phpunit.ci.xml --coverage-clover=build/logs/clover.xml"
+        ],
+        "ci:test-integration": "@test --configuration=phpunit.ci.xml",
+        "ci:test-build": "@test --configuration=phpunit.ci.xml",
+        "ci:generate-coverage-badge": [
+            "@test --configuration=phpunit.coverage.xml",
+            "composer exec \"php-coveralls -v\""
+        ],
+        "lint": "phpcs",
+        "lint-fix": "phpcbf",
+        "start:test": [
+            "Composer\\Config::disableProcessTimeout",
+            "watch -n 30 -cx vendor/bin/phpunit --color=always --testsuite unit"
+        ],
+        "semgrep": "semgrep --lang php  ./src",
+        "smell": "phpmd ./src ansi design,cleancode,codesize,naming",
+        "test": "phpunit",
+        "acceptance-report-format": "sed -i -E -e '1i # Acceptance Test Report\\n' -e 's/^(\\S)/## \\1/' -e 's/^(## .*)$/\\1\\n/' -e 's/^ \\[/- [/' -e '$d' acceptance-test-results.md",
+        "start:testdb": [
+            "docker compose up -d mysql_migrations_integration_test_db",
+            "bash -lc 'for i in {1..60}; do docker inspect --format \"{{.State.Health.Status}}\" $(docker compose ps -q mysql_migrations_integration_test_db) 2>/dev/null | grep -q healthy && break; sleep 1; done'"
+        ],
+        "stop:testdb": [
+            "docker compose down"
+        ],
+        "test:acceptance": "@test --configuration=phpunit.dev.xml --testsuite acceptance",
+        "test:acceptance:report": [
+            "@test:acceptance --testdox-text acceptance-test-results.md",
+            "@acceptance-report-format"
+        ],
+        "test:unit": [
+            "@test --configuration=phpunit.dev.xml --testsuite unit"
+        ],
+        "test:integration": [
+            "@start:testdb",
+            "@putenv MYSQL_DATABASE=testdb",
+            "@putenv MYSQL_HOST=127.0.0.1",
+            "@putenv MYSQL_PORT=3306",
+            "@putenv MYSQL_USER=migrator",
+            "@putenv MYSQL_PASSWORD=migrator_pass",
+            "phpunit --configuration=phpunit.dev.xml --testsuite integration 2>/dev/null",
+            "@stop:testdb"
+        ],
+        "test:coverage": [
+            "@putenv XDEBUG_MODE=coverage",
+            "@test --configuration=phpunit.coverage.xml --coverage-html build/coverage"
+        ]
+    }
+}
