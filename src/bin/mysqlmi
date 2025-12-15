@@ -101,8 +101,6 @@ $migrationsDir = $hasCommandAndDir === true
     ? $lastArg
     : getcwd() . DIRECTORY_SEPARATOR .  DEFAULT_MIGRATIONS_FOLDER;
 
-
-
 match ($command) {
     "create" => createMigration(
         options: getopt("n:", ["name:"]),
