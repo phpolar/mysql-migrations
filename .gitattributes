@@ -11,6 +11,7 @@
 /CHANGELOG.md               export-ignore
 /composer.lock              export-ignore
 /docs                       export-ignore
+/docker-compose.yml         export-ignore
 /phpcs.xml                  export-ignore
 /phpdoc.xml                 export-ignore
 /phpunit.ci.xml             export-ignore
