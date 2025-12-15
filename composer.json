@@ -60,8 +60,8 @@
             "@putenv XDEBUG_MODE=coverage",
             "@test --configuration=phpunit.ci.xml --coverage-clover=build/logs/clover.xml"
         ],
-        "ci:test-integration": "@test --configuration=phpunit.ci.xml",
-        "ci:test-build": "@test --configuration=phpunit.ci.xml",
+        "ci:test-integration": "@test --configuration=phpunit.ci.xml --testsuite integration",
+        "ci:test-build": "@ci:test-integration",
         "ci:generate-coverage-badge": [
             "@test --configuration=phpunit.coverage.xml",
             "composer exec \"php-coveralls -v\""
