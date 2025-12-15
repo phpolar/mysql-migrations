@@ -44,7 +44,8 @@ Adds support for running migrations against a MySql database.
 
     "Migration" and a 13 digit timestamp will be prepended to the filename.
     For example, mysqlmi --name CreateProductTable create ./migrations
-    will generate a file named Migration1764993752674CreateProductTable.php in the [36mmigrations folder.
+    will generate a file named Migration1764993752674CreateProductTable.php
+    in the migrations folder.
 
 ## EXAMPLES
 
