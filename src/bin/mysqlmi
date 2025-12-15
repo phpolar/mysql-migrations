@@ -17,7 +17,13 @@ use function Phpolar\MysqlMigrations\printHelp;
 use function Phpolar\MysqlMigrations\revertMigration;
 use function Phpolar\MysqlMigrations\runMigrations;
 
-require __DIR__ . "/../../vendor/autoload.php";
+if (file_exists(__DIR__ . "/../../vendor/autoload.php") === true) {
+    // cloned project
+    require __DIR__ . "/../../vendor/autoload.php";
+} else if (file_exists(__DIR__ . "/../../../../../vendor/autoload.php") === true) {
+    // vendor folder
+    require __DIR__ . "/../../../../../vendor/autoload.php";
+}
 
 $fileWriter = new SimpleFileWriter();
 $logger = new StreamLogger(STDOUT);
