@@ -58,7 +58,7 @@
         "ci:lint-fix": "@lint-fix",
         "ci:test": [
             "@putenv XDEBUG_MODE=coverage",
-            "@test --configuration=phpunit.ci.xml --coverage-clover=build/logs/clover.xml"
+            "@ci:test-integration --coverage-clover=build/logs/clover.xml"
         ],
         "ci:test-integration": [
             "@start:testdb",
