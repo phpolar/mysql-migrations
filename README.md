@@ -9,6 +9,33 @@
 Adds support for running migrations against a MySql database.
 </p>
 
+<p align="center">
+    <a href='https://coveralls.io/github/phpolar/mysql-migrations?branch=main' target="_blank">
+        <img src='https://coveralls.io/repos/github/phpolar/mysql-migrations/badge.svg?branch=main' alt='Coverage Status'
+        >
+    </a>
+    <a href="https://packagist.org/packages/phpolar/mysql-migrations" target="_blank">
+        <img class="badge" src="http://poser.pugx.org/phpolar/mysql-migrations/v"
+        alt='Latest Stable Version'
+        >
+     </a>
+     <a href="https://packagist.org/packages/phpolar/mysql-migrations" target="_blank">
+        <img class="badge" src="http://poser.pugx.org/phpolar/mysql-migrations/downloads"
+        alt='Total Downloads'
+        >
+     </a>
+     <a href="https://packagist.org/packages/phpolar/mysql-migrations" target="_blank">
+        <img class="badge" src="http://poser.pugx.org/phpolar/mysql-migrations/license"
+        alt='License'
+        >
+     </a>
+     <a href="https://packagist.org/packages/phpolar/mysql-migrations" target="_blank">
+        <img class="badge" src="http://poser.pugx.org/phpolar/mysql-migrations/require/php"
+        alt='PHP Version Require'
+        >
+     </a>
+</div>
+
 # PHPolar Migration Runner (for MySqL)
 
 ## DESCRIPTION
