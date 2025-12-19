@@ -1,5 +1,11 @@
 # Phpolar MySql Migrations
 
+## 1.0.2 (2025-12-18)
+
+### Fix
+
+- remove one numeric character check from glob (#9)
+
 ## 1.0.1 (2025-12-14)
 
 ### Fix
