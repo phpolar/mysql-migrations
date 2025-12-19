@@ -64,7 +64,7 @@
             "@putenv MYSQL_PORT=3306",
             "@putenv MYSQL_USER=migrator",
             "@putenv MYSQL_PASSWORD=migrator_pass",
-            "@test --configuration=phpunit.coverage.xml --testsuite integration",
+            "@test --configuration=phpunit.coverage.xml",
             "@stop:testdb"
         ],
         "ci:test-integration": [
