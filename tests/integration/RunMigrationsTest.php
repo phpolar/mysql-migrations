@@ -86,6 +86,13 @@ final class RunMigrationsTest extends TestCase
             SQL,
         );
 
+        $this->assertSame(
+            4,
+            $this->connection
+                ->query("SELECT COUNT(*) FROM `migration` WHERE status='COMPLETED'")
+                ->fetchColumn()
+        );
+
 
         $this->assertNotFalse($stmt);
 

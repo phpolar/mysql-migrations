@@ -108,6 +108,7 @@ final class RevertMigrationTest extends TestCase
     public function revertsLastMigration()
     {
         revertMigration(
+            migrationsDir: dirname(__DIR__) . "/__migrations__/",
             connection: $this->connection,
             logger: new StreamLogger(STDERR),
         );
