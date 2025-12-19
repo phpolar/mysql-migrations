@@ -58,7 +58,14 @@
         "ci:lint-fix": "@lint-fix",
         "ci:test": [
             "@putenv XDEBUG_MODE=coverage",
-            "@ci:test-integration --coverage-clover=build/logs/clover.xml"
+            "@start:testdb",
+            "@putenv MYSQL_DATABASE=testdb",
+            "@putenv MYSQL_HOST=127.0.0.1",
+            "@putenv MYSQL_PORT=3306",
+            "@putenv MYSQL_USER=migrator",
+            "@putenv MYSQL_PASSWORD=migrator_pass",
+            "@test --configuration=phpunit.coverage.xml --testsuite integration",
+            "@stop:testdb"
         ],
         "ci:test-integration": [
             "@start:testdb",
